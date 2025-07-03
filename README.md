@@ -23,7 +23,7 @@ A utility to simplify your image directory structure and standardize file naming
 python3 flatten_and_rename_jpeg.py
 ```
 
-### 2. Generate Image CSV (`generate_image_csv.py`)
+### 2. Generate Image CSV (`image_path_exporter.py`)
 
 Creates a comprehensive CSV inventory of your image files.
 
