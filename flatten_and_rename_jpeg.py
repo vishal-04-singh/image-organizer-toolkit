@@ -1,39 +1,48 @@
 import os
 import shutil
 
-# Change this to your base directory
-base_dir = "/Users/vishal04/Developer/META/Vivek"
+# Base directory path
+base_dir = "Vishal"
 
-# Loop through all main folders (e.g., 7, 31)
-for main_folder in os.listdir(base_dir):
+# Mapping of subfolders to naming prefix
+prefix_map = {
+    "n": "N",
+    "2y": "N",
+    "o": "O",
+    "10y": "O"
+}
+
+# Loop through all main folders like 1, 2, 3...
+for main_folder in sorted(os.listdir(base_dir)):
     main_folder_path = os.path.join(base_dir, main_folder)
     if os.path.isdir(main_folder_path):
-        # Loop through subfolders like "2Y, N", "10Y, O", etc.
+        print(f"\nProcessing folder: {main_folder_path}")
+
+        # Counters for renaming
+        counters = {"N": 1, "O": 1}
+
+        # Check each subfolder
         for subfolder in os.listdir(main_folder_path):
             subfolder_path = os.path.join(main_folder_path, subfolder)
             if os.path.isdir(subfolder_path):
-                # Decide prefix from subfolder name
-                if "N" in subfolder:
-                    prefix = "N"
-                elif "O" in subfolder:
-                    prefix = "O"
-                else:
-                    print(f"Skipping unknown type folder: {subfolder}")
-                    continue
+                key = subfolder.strip().lower()
+                if key in prefix_map:
+                    prefix = prefix_map[key]
+                    print(f"  Found subfolder: {subfolder} → Using prefix: {prefix}")
 
-                count = 1
-                for filename in sorted(os.listdir(subfolder_path)):
-                    file_path = os.path.join(subfolder_path, filename)
-                    if filename.lower().endswith(".jpeg"):
-                        new_name = f"{prefix}_{count}.jpg"
-                        new_path = os.path.join(main_folder_path, new_name)
-                        print(f"Moving + Renaming: {file_path} → {new_path}")
-                        shutil.move(file_path, new_path)
-                        count += 1
+                    # Process image files
+                    for filename in sorted(os.listdir(subfolder_path)):
+                        file_path = os.path.join(subfolder_path, filename)
+                        if filename.lower().endswith(('.jpeg', '.jpg', '.webp')):
+                            new_name = f"{prefix}_{counters[prefix]}.jpg"
+                            new_path = os.path.join(main_folder_path, new_name)
+                            print(f"    Renaming + Moving: {filename} → {new_name}")
+                            shutil.move(file_path, new_path)
+                            counters[prefix] += 1
 
-                # Try to delete subfolder after moving
-                try:
-                    os.rmdir(subfolder_path)
-                    print(f"Deleted folder: {subfolder_path}")
-                except OSError as e:
-                    print(f"Could not delete folder {subfolder_path}: {e}")
+                    # Delete the subfolder if empty
+                    try:
+                        os.rmdir(subfolder_path)
+                        print(f"  Deleted empty subfolder: {subfolder_path}")
+                    except OSError as e:
+                        print(f"  Failed to delete folder {subfolder_path}: {e}")
